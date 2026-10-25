@@ -58,7 +58,7 @@ $('exportPdf').addEventListener('click',()=>{
   if(!state.loading.registrations)return toast('Rekod pendaftaran masih dimuatkan. Sila cuba sebentar lagi.','error');
   if(!window.jspdf?.jsPDF)return toast('Pustaka PDF gagal dimuat. Semak sambungan internet dan muat semula halaman.','error');
   try{
-    const doc=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+    const doc=new window.jspdf.jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
     if(typeof doc.autoTable!=='function')throw new Error('Pustaka jadual PDF gagal dimuat. Muat semula halaman.');
     const records=recordArray(),spouses=records.filter(r=>r.spouse).length;
     doc.setFont('helvetica','bold');doc.setFontSize(17);doc.setTextColor(136,19,55);
@@ -68,16 +68,16 @@ $('exportPdf').addEventListener('click',()=>{
     doc.text('Jumlah pendaftaran: '+records.length+' | Pasangan: '+spouses+' | Jumlah individu: '+(records.length+spouses),14,32);
     doc.text('Dijana pada: '+formatDate(Date.now()),14,39);
     doc.autoTable({startY:45,margin:{top:15,right:14,bottom:17,left:14},
-      head:[['Bil.','Nama peserta','Kategori','Nama pasangan','Catatan','Tarikh pendaftaran']],
-      body:records.length?records.map((r,i)=>[i+1,r.name,r.category==='PIBG'?'PIBG/PASANGAN':r.category,r.spouse||'Tiada',r.notes||'-',formatDate(r.createdAt)]):[[{content:'Tiada pendaftaran.',colSpan:6,styles:{halign:'center'}}]],
+      head:[['Bil.','Nama peserta','Kategori','Nama pasangan']],
+      body:records.length?records.map((r,i)=>[i+1,r.name,r.category==='PIBG'?'PIBG/PASANGAN':r.category,r.spouse||'Tiada']):[[{content:'Tiada pendaftaran.',colSpan:4,styles:{halign:'center'}}]],
       styles:{font:'helvetica',fontSize:9,cellPadding:3,overflow:'linebreak',valign:'top'},
       headStyles:{fillColor:[136,19,55]},alternateRowStyles:{fillColor:[252,246,248]},
-      columnStyles:{0:{cellWidth:12},1:{cellWidth:57},2:{cellWidth:32},3:{cellWidth:53},4:{cellWidth:70},5:{cellWidth:45}}
+      columnStyles:{0:{cellWidth:12},1:{cellWidth:69},2:{cellWidth:32},3:{cellWidth:69}}
     });
     const pages=doc.internal.getNumberOfPages();
     for(let page=1;page<=pages;page++){
       doc.setPage(page);doc.setFontSize(9);doc.setTextColor(100);
-      doc.text('BERKAT SK Seri Jaya | Halaman '+page+' / '+pages,14,202);
+      doc.text('BERKAT SK Seri Jaya | Halaman '+page+' / '+pages,14,doc.internal.pageSize.getHeight()-8);
     }
     doc.save('pendaftaran-bowling-sejaya.pdf');toast('Fail PDF telah dijana.');
   }catch(err){toast('Tidak dapat menjana PDF: '+errorText(err),'error')}
